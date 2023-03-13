@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  postgres-products:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: products
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 127.0.0.1:5432:5432
+    volumes:
+      - ./docker/postgres/products:/var/lib/postgresql/data

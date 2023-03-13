@@ -4,7 +4,7 @@ import {ProductEntity} from "../../persistence/entities/product.entity";
 
 export function updateProductRouteFactory(productRepository : Repository<ProductEntity>){
     return async (req: Request, res: Response) => {
-        const productId: string = req.query['productId'] as string;
+        const productId: string = req.params['productId'] as string;
 
         if (!productId) {
             res.sendStatus(400);
@@ -23,9 +23,15 @@ export function updateProductRouteFactory(productRepository : Repository<Product
             return;
         }
 
-        const product = await productRepository.findOneBy({
-            id: productId
-        })
+        let product;
+        try {
+            product = await productRepository.findOneBy({
+                id: productId
+            })
+        } catch (e) {
+            res.sendStatus(400);
+            return;
+        }
 
         if (!product) {
             res.sendStatus(404);
@@ -34,7 +40,12 @@ export function updateProductRouteFactory(productRepository : Repository<Product
 
         product.name = body.name;
         product.price = body.price;
-        await productRepository.save(product);
+        try {
+            await productRepository.save(product);
+        } catch (e) {
+            res.sendStatus(400);
+            return;
+        }
 
         res.sendStatus(200);
     }

@@ -1,4 +1,4 @@
-import {Column, Entity, PrimaryGeneratedColumn, Unique} from "typeorm";
+import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
 
 class DecimalColumnTransformer {
     to(data: number): number {
@@ -10,7 +10,6 @@ class DecimalColumnTransformer {
 }
 
 @Entity()
-@Unique(['email'])
 export class ProductEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string;

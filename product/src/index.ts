@@ -5,6 +5,7 @@ import express, {NextFunction, Request, Response} from "express";
 
 import {AppDataSource} from "./persistence/database";
 import {router, registerRoutes} from "./api/api";
+import cookieParser from "cookie-parser";
 
 Promise.all([
     AppDataSource.initialize()
@@ -13,6 +14,8 @@ Promise.all([
 
     const app = express();
     app.set('trust proxy', 1);
+
+    app.use(cookieParser());
 
     // Ensure the caller has the right to use the API
     app.use((req: Request, res: Response, next: NextFunction) => {
