@@ -4,6 +4,8 @@ import {ProductEntity} from "../../persistence/entities/product.entity";
 
 export function getAllProductsRouteFactory(productRepository : Repository<ProductEntity>){
     return async (req: Request, res: Response) => {
+        const products = await productRepository.find()
 
+        res.json(products)
     }
 }
