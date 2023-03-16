@@ -1,26 +1,32 @@
 import dotenv from 'dotenv';
 dotenv.config({path: __dirname + '/.env'});
 
-import {Kafka} from "kafkajs";
+import {Kafka, logLevel} from "kafkajs";
 import express from "express";
 import {registerRoutes, router} from "./api/api";
+import {ResponseTopicListenerManager} from "./listener/response-topic-listener-manager";
 
 const kafka: Kafka = new Kafka({
     clientId: process.env.CLIENT_ID,
-    brokers: [process.env.KAFKA_ADDRESS]
+    brokers: [process.env.KAFKA_ADDRESS],
+    logLevel: logLevel.NOTHING
 });
 const topicName = process.env.TOPIC_NAME;
+const responseTopicName = process.env.RESPONSE_TOPIC_NAME;
 
-const app = express();
-app.set('trust proxy', 1);
+const responseTopicListenerManager = new ResponseTopicListenerManager();
+responseTopicListenerManager.startListening(kafka, responseTopicName).then(() => {
+    const app = express();
+    app.set('trust proxy', 1);
 
-// Parse request body as json
-app.use(express.json());
+    // Parse request body as json
+    app.use(express.json());
 
-registerRoutes(router, kafka, topicName)
-app.use(router)
+    registerRoutes(router, kafka, topicName, responseTopicListenerManager)
+    app.use(router)
 
-const port = process.env.PORT;
-app.listen(port, () => {
-    console.log(`Distributed manager service is running on port ${port}.`);
-});
+    const port = process.env.PORT;
+    app.listen(port, () => {
+        console.log(`Distributed manager service is running on port ${port}.`);
+    });
+})
