@@ -12,6 +12,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: products
       POSTGRES_PASSWORD: postgres
+    ports:
+      - '127.0.0.1:5432:5432'
     volumes:
       - ./docker/postgres/products:/var/lib/postgresql/data
 
@@ -19,15 +21,19 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     restart: unless-stopped
+    ports:
+      - "127.0.0.1:2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
 
-  # reachable on 29092 from inside docker compose
+  # reachable on 9092 from the host and on 29092 from inside docker compose
   kafka:
     image: confluentinc/cp-kafka:latest
     restart: unless-stopped
     depends_on:
       - zookeeper
+    ports:
+      - '127.0.0.1:9092:9092'
     expose:
       - '29092'
     environment:
@@ -55,49 +61,3 @@ services:
       echo -e 'Successfully created the following topics:'
       kafka-topics --bootstrap-server kafka:29092 --list
       "
-
-  hello-service:
-    build: hello/
-    restart: unless-stopped
-    expose:
-      - '10003'
-
-  product-service:
-    build: product/
-    restart: unless-stopped
-    expose:
-      - '10001'
-    depends_on:
-      - postgres-products
-
-  distributed-manager:
-    build: distributed-manager/
-    restart: unless-stopped
-    expose:
-      - '10002'
-    depends_on:
-      - kafka
-
-  distributed-worker-1:
-    build: distributed-worker/
-    restart: unless-stopped
-    depends_on:
-      - kafka
-
-  distributed-worker-2:
-    build: distributed-worker/
-    restart: unless-stopped
-    depends_on:
-      - kafka
-
-  gateway:
-    build: gateway/
-    restart: unless-stopped
-    ports:
-      - '127.0.0.1:10000:10000'
-    depends_on:
-      - hello-service
-      - product-service
-      - distributed-manager
-      - distributed-worker-1
-      - distributed-worker-2
