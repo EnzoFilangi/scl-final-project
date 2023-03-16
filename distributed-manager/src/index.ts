@@ -1,0 +1,26 @@
+import dotenv from 'dotenv';
+dotenv.config({path: __dirname + '/.env'});
+
+import {Kafka} from "kafkajs";
+import express from "express";
+import {registerRoutes, router} from "./api/api";
+
+const kafka: Kafka = new Kafka({
+    clientId: process.env.CLIENT_ID,
+    brokers: [process.env.KAFKA_ADDRESS]
+});
+const topicName = process.env.TOPIC_NAME;
+
+const app = express();
+app.set('trust proxy', 1);
+
+// Parse request body as json
+app.use(express.json());
+
+registerRoutes(router, kafka, topicName)
+app.use(router)
+
+const port = process.env.PORT;
+app.listen(port, () => {
+    console.log(`Distributed manager service is running on port ${port}.`);
+});
