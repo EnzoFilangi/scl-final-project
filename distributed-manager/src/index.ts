@@ -8,8 +8,7 @@ import {ResponseTopicListenerManager} from "./listener/response-topic-listener-m
 
 const kafka: Kafka = new Kafka({
     clientId: process.env.CLIENT_ID,
-    brokers: [process.env.KAFKA_ADDRESS],
-    logLevel: logLevel.NOTHING
+    brokers: [process.env.KAFKA_ADDRESS]
 });
 const topicName = process.env.TOPIC_NAME;
 const responseTopicName = process.env.RESPONSE_TOPIC_NAME;
