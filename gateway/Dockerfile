@@ -11,6 +11,7 @@ COPY tsconfig*.json ./
 COPY ./src ./src
 RUN rm ./src/.env
 RUN mv ./src/.env.docker ./src/.env
+
 RUN npm ci --quiet && npm run build
 
 #

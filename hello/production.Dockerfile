@@ -9,10 +9,8 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 COPY tsconfig*.json ./
 COPY ./src ./src
-RUN rm ./src/.env
-RUN mv ./src/.env.docker ./src/.env
 
-RUN npm ci --quiet && npm run build
+RUN npm ci --quiet && npm run build:prod
 
 #
 # Production stage.
